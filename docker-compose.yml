@@ -38,7 +38,11 @@ services:
     volumes:
       - ./uploads:/app/uploads  #   
       - ./app.py:/app/app.py  # Flask    
-      - ./requirements.txt:/app/requirements.txt  #   
+      - ./requirements.txt:/app/requirements.txt  #
+      - ./dscnn.h4:/app/dscnn.h4  #
+      - ./knn_model_no_year.pkl:/app/knn_model_no_year.pkl  #
+      - ./preprocessor.pkl:/app/preprocessor.pkl  #   
+      - ./yield_df.csv:/app/yield_df.csv #
     depends_on:
       - farmos-db
     networks:
@@ -65,4 +69,3 @@ networks:
 
 volumes:
   mongo-data:
-

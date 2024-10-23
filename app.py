@@ -15,17 +15,25 @@ client = MongoClient(MONGO_URI)
 db = client['farmosdb']
 collection = db['photos']
 
+df = pd.read_csv("yield_df.csv")
+df.drop('Unnamed: 0', axis=1, inplace=True)
+df = df[['average_rain_fall_mm_per_year', 'avg_temp', 'Item', 'hg/ha_yield']]
+
+# CNN 모델 로드
+model_path = "dscnn.h5"
+model = load_model(model_path)
+
 # 업로드 폴더 설정
 UPLOAD_FOLDER = './uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # TODO: 메소드 1 구현부분: 사진을 통한 질병데이터 생성
-def generate_score():
+def generate_score(img):
     return random.randint(1, 10)
 
 # TODO: 메소드 2 구현부분: 센서 데이터를 통한 결과
-def generate_score_by_sensor(sensor1, sensor2, sensor3):
-    return random.randint(1, 10)
+def generate_score_by_sensor(temperature, df):
+    return predict_yield(temperature)
 
 
 # 파일 업로드 엔드포인트
@@ -68,11 +76,11 @@ def sensor_score():
     try:
         # TODO: 원하는 센서데이터 갯수만큼 조절하기
         sensor1 = float(request.json.get('sensor1'))
-        sensor2 = float(request.json.get('sensor2'))
-        sensor3 = float(request.json.get('sensor3'))
+        # sensor2 = float(request.json.get('sensor2'))
+        # sensor3 = float(request.json.get('sensor3'))
 
         # TODO: 메소드2 사용위치
-        score = generate_score_by_sensor(sensor1,sensor2,sensor3) # 1~10 사이로 제한
+        score = generate_score_by_sensor(temperature) # 1~10 사이로 제한
 
         return jsonify({
             'score': score
