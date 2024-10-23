@@ -1,0 +1,15 @@
+flask
+flask-cors
+pymongo
+gunicorn
+opencv-python
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+tensorflow
+keras
+tqdm
+joblib
+

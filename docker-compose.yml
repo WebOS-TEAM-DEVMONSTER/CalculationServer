@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  farmos-db:
+    image: mongo:latest
+    platform: linux/amd64
+    container_name: farmos-db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: farmos
+      MONGO_INITDB_ROOT_PASSWORD: taehyun
+      MONGO_INITDB_DATABASE: farmosdb
+    networks:
+      - farmos-network
+    volumes:
+      - mongo-data:/data/db
+
+  farmos-app:
+    image: snowmate318/farmos-app
+    platform: linux/amd64
+    container_name: farmos-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://farmos:taehyun@farmos-db:27017/farmosdb
+    depends_on:
+      - farmos-db
+    networks:
+      - farmos-network
+
+  flask-app:
+    build: .
+    platform: linux/amd64
+    container_name: flask-app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads  #   
+      - ./app.py:/app/app.py  # Flask    
+      - ./requirements.txt:/app/requirements.txt  #   
+    depends_on:
+      - farmos-db
+    networks:
+      - farmos-network
+
+  nginx:
+    image: nginx:latest
+    platform: linux/amd64
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./uploads:/usr/share/nginx/html/uploads
+    depends_on:
+      - farmos-app
+      - flask-app
+    networks:
+      - farmos-network
+
+networks:
+  farmos-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+
